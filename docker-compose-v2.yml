@@ -1,0 +1,34 @@
+version: '3.9'
+services:
+ minio:
+    container_name: minio-s2
+    image: quay.io/minio/minio
+    networks:
+      - nginx-proxymanager_default
+    volumes:
+      - box_data:/data
+    environment:
+      MINIO_ROOT_USER: [utilizador]
+      MINIO_ROOT_PASSWORD: [palavra-passe]
+      MINIO_BROWSER_REDIRECT_URL: https://[subdominio1]
+      MINIO_SERVER_URL: https://[subdominio2]
+    command: server /data --console-address ":9001"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+          limits:
+            cpus: '0.5'
+            memory: 1024M
+
+volumes:
+  minio_data:
+    external: true
+
+networks:
+  nginx-proxymanager_default:
+    external: true
